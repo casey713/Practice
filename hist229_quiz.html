@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HIST 229 Study Quiz</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: #fff;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .question {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .answers {
+            text-align: left;
+        }
+
+        .answers label {
+            display: block;
+            background: #333;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .answers label:hover {
+            background: #444;
+        }
+
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        button {
+            background: #2575fc;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #6a11cb;
+        }
+
+        #results {
+            margin-top: 20px;
+            font-size: 1.5em;
+        }
+
+        #progress {
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+
+            button {
+                margin-bottom: 10px;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>HIST 229 Study Quiz</h1>
+        <div id="progress"></div>
+        <div id="quiz-container"></div>
+        <div class="buttons">
+            <button id="submit" onclick="submitQuiz()">Submit</button>
+            <button id="rephrase" onclick="generateQuiz()">Generate New Quiz</button>
+        </div>
+        <div id="results"></div>
+    </div>
+    <script>
+        const quizContainer = document.getElementById('quiz-container');
+        const resultsContainer = document.getElementById('results');
+        const progressContainer = document.getElementById('progress');
+
+        const questionPool = [
+            {
+                questionVariants: [
+                    "What was the Battle of Verdun?",
+                    "Describe the Battle of Verdun."
+                ],
+                answers: {
+                    a: "A long and deadly battle between Germany and France in WWI (1916).",
+                    b: "A battle in WWII between Germany and the Soviet Union.",
+                    c: "A naval battle between the British and German fleets."
+                },
+                correctAnswer: "a",
+                explanations: [
+                    "The Battle of Verdun was one of the longest and most devastating battles of World War I, symbolizing the determination of both French and German forces.",
+                    "It was a significant and grueling conflict in WWI between French and German armies, noted for its length and high casualties."
+                ]
+            },
+            {
+                questionVariants: [
+                    "What did Philipp Scheidemann declare on November 9, 1918?",
+                    "What significant political change did Philipp Scheidemann announce on November 9, 1918?"
+                ],
+                answers: {
+                    a: "The start of WWII.",
+                    b: "The German Republic, ending the monarchy.",
+                    c: "The annexation of Austria."
+                },
+                correctAnswer: "b",
+                explanations: [
+                    "Scheidemann proclaimed the German Republic, marking the end of the German monarchy and the beginning of the Weimar Republic.",
+                    "On this date, Scheidemann announced the establishment of the German Republic, thereby ending the monarchical rule."
+                ]
+            },
+            {
+                questionVariants: [
+                    "What was the T4 Program?",
+                    "Explain the purpose of the T4 Program initiated by the Nazis."
+                ],
+                answers: {
+                    a: "A Nazi plan to kill disabled people starting in 1939.",
+                    b: "A Soviet plan for agricultural reform.",
+                    c: "An Allied plan to rebuild Europe after WWII."
+                },
+                correctAnswer: "a",
+                explanations: [
+                    "The T4 Program was a Nazi initiative to systematically murder disabled individuals, which later evolved into broader genocidal practices.",
+                    "This program was initiated by the Nazis to eliminate people with disabilities, setting a precedent for their later genocidal actions."
+                ]
+            },
+            {
+                questionVariants: [
+                    "What is the significance of Hannah Arendt's book 'Eichmann in Jerusalem'?",
+                    "Why is Hannah Arendt's book 'Eichmann in Jerusalem' important?"
+                ],
+                answers: {
+                    a: "It detailed Eichmann's personal life.",
+                    b: "It introduced the idea that ordinary people can commit horrific acts without being inherently evil.",
+                    c: "It described the military strategies of WWII."
+                },
+                correctAnswer: "b",
+                explanations: [
+                    "Arendt's book introduced the concept of the 'banality of evil', suggesting that ordinary people can commit atrocious acts without malicious intent.",
+                    "The book highlighted how normal individuals, like Eichmann, can participate in atrocious acts due to systemic and situational factors."
+                ]
+            },
+            {
+                questionVariants: [
+                    "What did the Nuremberg Laws do?",
+                    "What were the main provisions of the Nuremberg Laws?"
+                ],
+                answers: {
+                    a: "Allowed Jews to become German citizens.",
+                    b: "Prohibited marriages and relationships between Jews and non-Jews.",
+                    c: "Granted equal rights to all German citizens."
+                },
+                correctAnswer: "b",
+                explanations: [
+                    "The Nuremberg Laws institutionalized racial discrimination by forbidding marriages between Jews and non-Jews and stripping Jews of German citizenship.",
+                    "These laws were enacted to prevent Jews from marrying or having relationships with non-Jews, enforcing racial segregation."
+                ]
+            },
+            {
+                questionVariants: [
+                    "What is the 'stab in the back' myth?",
+                    "What does the 'stab in the back' myth refer to?"
+                ],
+                answers: {
+                    a: "The idea that German Jews betrayed Germany during WWI.",
+                    b: "The theory that France was responsible for Germany's defeat.",
+                    c: "The belief that internal enemies, including Jews, caused Germany's loss in WWI."
+                },
+                correctAnswer: "c",
+                explanations: [
+                    "The 'stab in the back' myth falsely suggested that Germany's defeat in WWI was due to internal betrayal rather than military failures, often blaming Jews and other groups.",
+                    "This myth was propagated to accuse internal groups, like Jews, of undermining Germany's war effort, despite the actual military reasons for the defeat."
+                ]
+            },
+            {
+                questionVariants: [
+                    "What was the Generalplan Ost?",
+                    "Explain the objectives of Generalplan Ost."
+                ],
+                answers: {
+                    a: "A Nazi plan for taking over and resettling Eastern Europe.",
+                    b: "A Soviet plan for Western expansion.",
+                    c: "An Allied plan for post-WWII reconstruction."
+                },
+                correctAnswer: "a",
+                explanations: [
+                    "Generalplan Ost was a Nazi policy aiming to colonize Eastern Europe, displacing and exterminating the local populations to make way for German settlers.",
+                    "This plan involved the systematic removal and extermination of Eastern European populations to make room for German settlers as part of Nazi expansionist goals."
+                ]
+            },
+            {
+                questionVariants: [
+                    "What was the impact of WWI on German Jews?",
+                    "How did WWI affect German Jews?"
+                ],
+                answers: {
+                    a: "Improved their social status.",
+                    b: "Led to increased anti-Semitism and scapegoating.",
+                    c: "Had no significant impact."
+                },
+                correctAnswer: "b",
+                explanations: [
+                    "WWI exacerbated anti-Semitic sentiments in Germany, with Jews being blamed for the country's defeat and economic troubles.",
+                    "The war intensified anti-Semitic attitudes, as Jews were often scapegoated for Germany's military and economic hardships."
+                ]
+            },
+            {
+                questionVariants: [
+                    "What did the Munich Accords lead to?",
+                    "What was the outcome of the Munich Accords?"
+                ],
+                answers: {
+                    a: "Peace between France and Germany.",
+                    b: "Appeasement of Hitler by allowing Germany to annex parts of Czechoslovakia.",
+                    c: "Formation of the United Nations."
+                },
+                correctAnswer: "b",
+                explanations: [
+                    "The Munich Accords are notorious for their role in appeasing Hitler by permitting the annexation of the Sudetenland, which emboldened further Nazi aggression.",
+                    "This agreement is a key example of appeasement, where European powers allowed Nazi Germany to annex part of Czechoslovakia, hoping to prevent further conflict."
+                ]
+            },
+            {
+                questionVariants: [
+                    "What was the purpose of the Law for the Prevention of Hereditarily Diseased Offspring?",
+                    "What was the goal of the Law for the Prevention of Hereditarily Diseased Offspring?"
+                ],
+                answers: {
+                    a: "To allow forced sterilization of people with certain genetic conditions.",
+                    b: "To provide medical care for the disabled.",
+                    c: "To promote large families in Germany."
+                },
+                correctAnswer: "a",
+                explanations: [
+                    "This law was enacted to forcibly sterilize individuals deemed 'genetically inferior', reflecting the Nazis' eugenic policies aimed at 'racial purity'.",
+                    "The law aimed to prevent those with hereditary conditions from reproducing, aligning with the Nazi eugenics agenda."
+                ]
+            }
+        ];
+
+        let selectedQuestions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+
+        function getRandomQuestions() {
+            const shuffled = questionPool.sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, 5);
+        }
+
+        function getRandomVariant(variants) {
+            return variants[Math.floor(Math.random() * variants.length)];
+        }
+
+        function buildQuiz() {
+            const currentQuestion = selectedQuestions[currentQuestionIndex];
+            const answers = [];
+
+            for (letter in currentQuestion.answers) {
+                answers.push(
+                    `<label>
+                        <input type="radio" name="question${currentQuestionIndex}" value="${letter}">
+                        ${letter} :
+                        ${currentQuestion.answers[letter]}
+                    </label>`
+                );
+            }
+
+            quizContainer.innerHTML = `
+                <div class="question"> ${getRandomVariant(currentQuestion.questionVariants)} </div>
+                <div class="answers"> ${answers.join('')} </div>
+            `;
+
+            progressContainer.innerHTML = `Question ${currentQuestionIndex + 1} of ${selectedQuestions.length}`;
+        }
+
+        function submitQuiz() {
+            const answerContainers = quizContainer.querySelectorAll('.answers');
+            const currentQuestion = selectedQuestions[currentQuestionIndex];
+            const selector = `input[name=question${currentQuestionIndex}]:checked`;
+            const userAnswer = (answerContainers[0].querySelector(selector) || {}).value;
+
+            userAnswers.push(userAnswer);
+
+            if (userAnswer === currentQuestion.correctAnswer) {
+                answerContainers[0].style.color = 'green';
+            } else {
+                answerContainers[0].style.color = 'red';
+            }
+
+            currentQuestionIndex++;
+            if (currentQuestionIndex < selectedQuestions.length) {
+                buildQuiz();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            let numCorrect = 0;
+
+            selectedQuestions.forEach((question, index) => {
+                if (userAnswers[index] === question.correctAnswer) {
+                    numCorrect++;
+                }
+            });
+
+            resultsContainer.innerHTML = `
+                <p>${numCorrect} out of ${selectedQuestions.length} correct</p>
+                <button onclick="reviewAnswers()">Review Answers</button>
+            `;
+        }
+
+        function reviewAnswers() {
+            const output = [];
+
+            selectedQuestions.forEach((currentQuestion, questionNumber) => {
+                const answer = userAnswers[questionNumber];
+                const correct = answer === currentQuestion.correctAnswer;
+                const color = correct ? 'green' : 'red';
+
+                output.push(
+                    `<div class="question" style="color:${color}"> ${getRandomVariant(currentQuestion.questionVariants)} </div>
+                    <div class="answers"> 
+                        ${Object.keys(currentQuestion.answers).map(letter => `
+                            <label style="color:${letter === currentQuestion.correctAnswer ? 'green' : ''}">
+                                ${letter} : ${currentQuestion.answers[letter]}
+                            </label>
+                        `).join('')}
+                        <p>Explanation: ${getRandomVariant(currentQuestion.explanations)}</p>
+                    </div>`
+                );
+            });
+
+            quizContainer.innerHTML = output.join('');
+        }
+
+        function generateQuiz() {
+            selectedQuestions = getRandomQuestions();
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            buildQuiz();
+        }
+
+        generateQuiz();
+    </script>
+</body>
+</html>
